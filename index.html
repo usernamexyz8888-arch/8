@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Link</title>
+<title>My Page</title>
 
 <style>
 * {
@@ -22,7 +22,7 @@ body {
   padding: 24px;
   font-family: Arial, sans-serif;
   background: #101014;
-  color: #ffffff;
+  color: #fff;
 }
 
 main {
@@ -45,7 +45,8 @@ p {
   line-height: 1.6;
 }
 
-button, .link-button {
+.link-button,
+button {
   display: inline-block;
   width: 100%;
   margin-top: 12px;
@@ -61,7 +62,17 @@ button, .link-button {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
+}
+
+.goog-te-banner-frame,
+.goog-te-gadget,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
 }
 </style>
 </head>
@@ -69,32 +80,42 @@ button, .link-button {
 <body>
 <main>
 
-<section id="checking">
-  <h2>Checking availability</h2>
-  <p>Please wait while we check your region.</p>
+<section id="checking" class="hidden">
+  <h2 id="checking-title">Checking availability</h2>
+  <p id="checking-text">Please wait a moment.</p>
 </section>
 
 <section id="indonesia" class="hidden">
-  <h2>Tautan tidak tersedia</h2>
-  <p>Maaf, tautan ini tidak tersedia untuk pengunjung dari Indonesia.</p>
+  <h2 id="id-title">
+    Sorry, this link is not available in your country.
+  </h2>
 </section>
 
-<section id="international" class="hidden">
-  <h2>Continue to website</h2>
-  <p>Click the button below to continue to the external website.</p>
+<section id="international">
+  <h2 id="destination-title">Are you over 18?</h2>
+  <p id="destination-text">
+    Get to know the real me! Find my personal photos, videos, and contact info—all in one place, completely free. 💕
+  </p>
   <a class="link-button"
+     id="destination-link"
      href="https://byuxyz8.github.io/mypage/shAnekwHSHne8qeytzxkls8"
      target="_blank"
      rel="noopener noreferrer">
-     Open website
+    Check Out My Page 💖
   </a>
 </section>
 
 <section id="error" class="hidden">
-  <h2>Region unavailable</h2>
-  <p>We couldn't verify your region. Please try again later.</p>
-  <button onclick="location.reload()">Try again</button>
+  <h2 id="error-title">Region unavailable</h2>
+  <p id="error-text">
+    We couldn't verify your region. Please try again later.
+  </p>
+  <button id="retry-button" onclick="location.reload()">
+    Try again
+  </button>
 </section>
+
+<div id="google_translate_element" class="hidden"></div>
 
 </main>
 
@@ -102,18 +123,55 @@ button, .link-button {
 (function () {
   "use strict";
 
-  var checking = document.getElementById("checking");
-
   function show(id) {
-    checking.classList.add("hidden");
+    document.getElementById("indonesia").classList.add("hidden");
+    document.getElementById("international").classList.add("hidden");
+    document.getElementById("error").classList.add("hidden");
     document.getElementById(id).classList.remove("hidden");
   }
 
-  fetch("https://ipapi.co/json/")
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error("Location check failed");
+  function setLanguage(lang) {
+    document.documentElement.lang = lang;
+
+    var t = {
+      id: {
+        title: "My Page",
+        unavailable: "Maaf, tautan ini tidak tersedia di negara Anda.",
+        continue: "Apakah Anda berusia di atas 18 tahun?",
+        description: "Kenali saya lebih dekat! Foto pribadi, video, dan kontak saya ada di satu tempat—semuanya gratis. 💕",
+        open: "Lihat Halaman Saya 💖"
+      },
+      en: {
+        title: "My Page",
+        unavailable: "Sorry, this link is not available in your country.",
+        continue: "Are you over 18?",
+        description: "Get to know the real me! Find my personal photos, videos, and contact info—all in one place, completely free. 💕",
+        open: "Check Out My Page 💖"
       }
+    };
+
+    var x = t[lang] || t.en;
+    document.title = x.title;
+    document.getElementById("id-title").textContent = x.unavailable;
+    document.getElementById("destination-title").textContent = x.continue;
+    document.getElementById("destination-text").textContent = x.description;
+    document.getElementById("destination-link").textContent = x.open;
+  }
+
+  function translatePage() {
+    if (window.google && google.translate) {
+      new google.translate.TranslateElement({
+        pageLanguage: "en",
+        autoDisplay: false
+      }, "google_translate_element");
+    }
+  }
+
+  window.googleTranslateElementInit = translatePage;
+
+  fetch("https://ipapi.co/json/", { cache: "no-store" })
+    .then(function (response) {
+      if (!response.ok) throw new Error("Location lookup failed");
       return response.json();
     })
     .then(function (data) {
@@ -122,21 +180,49 @@ button, .link-button {
       }
 
       if (data.country_code === "ID") {
-        document.documentElement.lang = "id";
-        document.title = "Tautan tidak tersedia";
+        setLanguage("id");
         show("indonesia");
-      } else {
-        document.documentElement.lang = "en";
-        document.title = "Continue to website";
-        show("international");
+        return;
+      }
+
+      setLanguage("en");
+      show("international");
+
+      var browserLang =
+        (navigator.languages && navigator.languages[0]) ||
+        navigator.language ||
+        "en";
+
+      browserLang = browserLang.split("-")[0].toLowerCase();
+
+      if (browserLang !== "en") {
+        var script = document.createElement("script");
+        script.src =
+          "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+        document.head.appendChild(script);
+
+        var attempts = 0;
+        var timer = setInterval(function () {
+          attempts++;
+          var select = document.querySelector(".goog-te-combo");
+
+          if (select) {
+            clearInterval(timer);
+            select.value = browserLang;
+            select.dispatchEvent(new Event("change"));
+          }
+
+          if (attempts >= 20) clearInterval(timer);
+        }, 500);
       }
     })
     .catch(function () {
-      document.documentElement.lang = "en";
-      show("error");
+      setLanguage("en");
+      show("international");
     });
 })();
 </script>
 
 </body>
-</html>
+  </html>
+  
