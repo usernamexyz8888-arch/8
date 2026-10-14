@@ -1,89 +1,143 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Link availability by region</title>
+<title>Link</title>
+
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px;font-family:Arial,Helvetica,sans-serif;background:#101014;color:#f5f5f7}
-main{width:100%;max-width:420px;padding:28px 22px;text-align:center;border:1px solid #34343d;border-radius:18px;background:#191920}
-h1{margin:0 0 12px;font-size:23px}
-p{margin:0 0 20px;line-height:1.55;color:#d1d1d8}
-.status{color:#c9c9d3;font-size:14px}
-a{display:block;padding:14px 18px;border-radius:12px;background:#ff4fa0;color:#171018;text-decoration:none;font-weight:700}
-.hidden{display:none}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  background: #101014;
+  color: #ffffff;
+}
+
+main {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px 22px;
+  text-align: center;
+  background: #191920;
+  border: 1px solid #34343d;
+  border-radius: 18px;
+}
+
+h2 {
+  font-size: 23px;
+  margin-top: 0;
+}
+
+p {
+  color: #d1d1d8;
+  line-height: 1.6;
+}
+
+button, .link-button {
+  display: inline-block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 15px;
+  border: 0;
+  border-radius: 12px;
+  background: #ff4fa0;
+  color: #171018;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
 </style>
 </head>
+
 <body>
 <main>
+
 <section id="checking">
-<h1 id="checking-title">Checking regional availability</h1>
-<p id="checking-text" class="status">Please wait a moment.</p>
+  <h2>Checking availability</h2>
+  <p>Please wait while we check your region.</p>
 </section>
-<section id="id-region" class="hidden">
-<h1>Tautan tidak tersedia di wilayah Anda</h1>
-<p>Maaf, tautan ini tidak tersedia untuk pengunjung dari Indonesia.</p>
+
+<section id="indonesia" class="hidden">
+  <h2>Tautan tidak tersedia</h2>
+  <p>Maaf, tautan ini tidak tersedia untuk pengunjung dari Indonesia.</p>
 </section>
-<section id="other-region" class="hidden">
-<h1 id="destination-title">Continue to the destination website</h1>
-<p id="destination-text">Press the button below to open the external website.</p>
-<a id="destination-link" href="https://byuxyz8.github.io/mypage/shAnekwHSHne8qeytzxkls8" target="_blank" rel="noopener noreferrer">Open website</a>
+
+<section id="international" class="hidden">
+  <h2>Continue to website</h2>
+  <p>Click the button below to continue to the external website.</p>
+  <a class="link-button"
+     href="https://byuxyz8.github.io/mypage/shAnekwHSHne8qeytzxkls8"
+     target="_blank"
+     rel="noopener noreferrer">
+     Open website
+  </a>
 </section>
-<section id="lookup-error" class="hidden">
-<h1 id="error-title">Region could not be verified</h1>
-<p id="error-text">Please try again later. The link has not been opened automatically because your region could not be confirmed.</p>
-<a id="retry-link" href="" onclick="location.reload();return false;">Try again</a>
+
+<section id="error" class="hidden">
+  <h2>Region unavailable</h2>
+  <p>We couldn't verify your region. Please try again later.</p>
+  <button onclick="location.reload()">Try again</button>
 </section>
+
 </main>
+
 <script>
-(function(){
-"use strict";
-var checking=document.getElementById("checking");
-function show(id){
-checking.classList.add("hidden");
-document.getElementById(id).classList.remove("hidden");
-}
-function setIndonesian(){
-document.documentElement.lang="id";
-document.title="Tautan tersedia berdasarkan wilayah";
-document.getElementById("checking-title").textContent="Memeriksa ketersediaan wilayah";
-document.getElementById("checking-text").textContent="Mohon tunggu sebentar.";
-document.getElementById("destination-title").textContent="Lanjutkan ke situs tujuan";
-document.getElementById("destination-text").textContent="Tekan tombol di bawah untuk membuka situs eksternal.";
-document.getElementById("destination-link").textContent="Buka situs";
-document.getElementById("error-title").textContent="Wilayah belum dapat diverifikasi";
-document.getElementById("error-text").textContent="Silakan coba lagi nanti. Tautan tidak dibuka otomatis karena wilayah pengunjung belum dapat dipastikan.";
-document.getElementById("retry-link").textContent="Coba lagi";
-}
-function setEnglish(){
-document.documentElement.lang="en";
-document.title="Link availability by region";
-}
-fetch("https://ipapi.co/json/",{cache:"no-store"})
-.then(function(response){
-if(!response.ok)throw new Error("Country lookup failed");
-return response.json();
-})
-.then(function(data){
-if(!data||!data.country_code)throw new Error("Country unavailable");
-if(data.country_code==="ID"){
-setIndonesian();
-show("id-region");
-}else{
-setEnglish();
-show("other-region");
-}
-})
-.catch(function(){
-/* If the country cannot be verified, use English and do not open the destination. */
-setEnglish();
-show("lookup-error");
-});
+(function () {
+  "use strict";
+
+  var checking = document.getElementById("checking");
+
+  function show(id) {
+    checking.classList.add("hidden");
+    document.getElementById(id).classList.remove("hidden");
+  }
+
+  fetch("https://ipapi.co/json/")
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("Location check failed");
+      }
+      return response.json();
+    })
+    .then(function (data) {
+      if (!data || !data.country_code) {
+        throw new Error("Country unavailable");
+      }
+
+      if (data.country_code === "ID") {
+        document.documentElement.lang = "id";
+        document.title = "Tautan tidak tersedia";
+        show("indonesia");
+      } else {
+        document.documentElement.lang = "en";
+        document.title = "Continue to website";
+        show("international");
+      }
+    })
+    .catch(function () {
+      document.documentElement.lang = "en";
+      show("error");
+    });
 })();
 </script>
+
 </body>
-</html>
+    </html>
+    
