@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Link</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  background: #101014;
+  color: #ffffff;
+}
+
+main {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px 22px;
+  text-align: center;
+  background: #191920;
+  border: 1px solid #34343d;
+  border-radius: 18px;
+}
+
+h2 {
+  font-size: 23px;
+  margin-top: 0;
+}
+
+p {
+  color: #d1d1d8;
+  line-height: 1.6;
+}
+
+button, .link-button {
+  display: inline-block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 15px;
+  border: 0;
+  border-radius: 12px;
+  background: #ff4fa0;
+  color: #171018;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<section id="checking">
+  <h2>Checking availability</h2>
+  <p>Please wait while we check your region.</p>
+</section>
+
+<section id="indonesia" class="hidden">
+  <h2>Tautan tidak tersedia</h2>
+  <p>Maaf, tautan ini tidak tersedia untuk pengunjung dari Indonesia.</p>
+</section>
+
+<section id="international" class="hidden">
+  <h2>Continue to website</h2>
+  <p>Click the button below to continue to the external website.</p>
+  <a class="link-button"
+     href="https://byuxyz8.github.io/mypage/shAnekwHSHne8qeytzxkls8"
+     target="_blank"
+     rel="noopener noreferrer">
+     Open website
+  </a>
+</section>
+
+<section id="error" class="hidden">
+  <h2>Region unavailable</h2>
+  <p>We couldn't verify your region. Please try again later.</p>
+  <button onclick="location.reload()">Try again</button>
+</section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var checking = document.getElementById("checking");
+
+  function show(id) {
+    checking.classList.add("hidden");
+    document.getElementById(id).classList.remove("hidden");
+  }
+
+  fetch("https://ipapi.co/json/")
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("Location check failed");
+      }
+      return response.json();
+    })
+    .then(function (data) {
+      if (!data || !data.country_code) {
+        throw new Error("Country unavailable");
+      }
+
+      if (data.country_code === "ID") {
+        document.documentElement.lang = "id";
+        document.title = "Tautan tidak tersedia";
+        show("indonesia");
+      } else {
+        document.documentElement.lang = "en";
+        document.title = "Continue to website";
+        show("international");
+      }
+    })
+    .catch(function () {
+      document.documentElement.lang = "en";
+      show("error");
+    });
+})();
+</script>
+
+</body>
+</html>
