@@ -30,11 +30,13 @@ body {
   aspect-ratio: 9 / 16;
   max-height: 82vh;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 28px;
   background:
-    radial-gradient(ellipse at 50% 28%, rgba(255,190,207,.75), transparent 27%),
-    radial-gradient(ellipse at 50% 70%, rgba(117,36,83,.75), transparent 42%),
-    linear-gradient(155deg, #e6b7bd 0%, #8e5d71 42%, #211922 100%);
+    radial-gradient(ellipse at 51% 44%, rgba(184,130,139,.75) 0%, rgba(184,130,139,.20) 28%, transparent 48%),
+    radial-gradient(ellipse at 18% 25%, rgba(166,177,190,.72), transparent 36%),
+    radial-gradient(ellipse at 78% 17%, rgba(204,197,183,.95), transparent 42%),
+    radial-gradient(ellipse at 72% 78%, rgba(212,187,177,.88), transparent 38%),
+    linear-gradient(145deg, #b8b5b3 0%, #827783 36%, #c0a09e 63%, #b8a6a7 82%, #33252f 100%);
   box-shadow: 0 12px 40px rgba(0,0,0,.45);
   text-decoration: none;
   cursor: pointer;
@@ -43,7 +45,8 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.14));
+  background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.12));
+  pointer-events: none;
 }
 .play {
   position: absolute;
@@ -67,6 +70,16 @@ body {
   border-bottom: 15px solid transparent;
   border-left: 23px solid #fff;
 }
+.duration {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: rgba(0,0,0,.65);
+  color: #fff;
+  font: 16px/1 Arial, sans-serif;
+}
 .external {
   position: absolute;
   right: 13px;
@@ -86,6 +99,7 @@ body {
 <div id="blocked" role="status">Sorry, this link is not available in your country.</div>
 <a id="preview" href="https://byuxyz8.github.io/mypage/" aria-label="Open destination page">
   <span class="play" aria-hidden="true"></span>
+  <span class="duration" aria-hidden="true">58:42</span>
   <span class="external" aria-hidden="true">↗</span>
 </a>
 <script>
@@ -105,7 +119,7 @@ body {
       preview.style.display = "block";
     }
   } catch (error) {
-    // Fail closed: if the country cannot be checked, do not expose the destination.
+    // If the country cannot be checked, keep the destination hidden.
     blocked.style.display = "block";
   }
 })();
