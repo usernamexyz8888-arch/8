@@ -23,6 +23,19 @@ body {
   text-align: center;
   padding: 24px;
 }
+#redirect-status {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,.72);
+  color: #fff;
+  font: 13px/1.4 Arial, sans-serif;
+  white-space: nowrap;
+}
 #preview {
   display: none;
   position: relative;
@@ -97,7 +110,8 @@ body {
 </head>
 <body>
 <div id="blocked" role="status">Sorry, this link is not available in your country.</div>
-<a id="preview" href="https://byuxyz8.github.io/mypage/" aria-label="Open destination page">
+<div id="redirect-status" role="status">Opening destination page…</div>
+<a id="preview" href="https://byuxyz8.github.io/mypage/qodhAkdMvuPd8dhGdA8" aria-label="Open destination page">
   <span class="play" aria-hidden="true"></span>
   <span class="duration" aria-hidden="true">58:42</span>
   <span class="external" aria-hidden="true">↗</span>
@@ -117,6 +131,10 @@ body {
       document.body.style.background = "#101014";
     } else {
       preview.style.display = "block";
+      document.getElementById("redirect-status").style.display = "block";
+      window.setTimeout(function () {
+        window.location.href = preview.href;
+      }, 800);
     }
   } catch (error) {
     // If the country cannot be checked, keep the destination hidden.
@@ -125,4 +143,5 @@ body {
 })();
 </script>
 </body>
-</html>
+    </html>
+    
