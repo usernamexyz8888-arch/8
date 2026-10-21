@@ -1,246 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<title>My🔥Page</title>
-
+<title>Instagram Username Checker</title>
 <style>
-* {
-  box-sizing: border-box;
-}
-
-html {
-  min-height: 100%;
-  background: #000;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background: #000;
-  color: #fff;
-}
-
-main {
-  display: none;
-  width: 100%;
-  max-width: 420px;
-  padding: 28px 22px;
-  margin: 0 auto;
-  text-align: center;
-  background: #191920;
-  border: 1px solid #34343d;
-  border-radius: 18px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-h2 {
-  font-size: 23px;
-  margin-top: 0;
-}
-
-p {
-  color: #d1d1d8;
-  line-height: 1.6;
-}
-
-.link-button,
-button {
-  display: inline-block;
-  width: 100%;
-  margin-top: 12px;
-  padding: 15px;
-  border: 0;
-  border-radius: 12px;
-  background: #ff4fa0;
-  color: #171018;
-  font-size: 16px;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-  animation: buttonShake 1.8s infinite;
-}
-
-@keyframes buttonShake {
-  0%, 80%, 100% {
-    transform: translateX(0);
-  }
-  82% {
-    transform: translateX(-3px);
-  }
-  84% {
-    transform: translateX(3px);
-  }
-  86% {
-    transform: translateX(-3px);
-  }
-  88% {
-    transform: translateX(3px);
-  }
-  90% {
-    transform: translateX(0);
-  }
-}
-
-.hidden {
-  display: none !important;
-}
-
-.goog-te-banner-frame,
-.goog-te-gadget,
-.goog-te-balloon-frame {
-  display: none !important;
-}
-
-body {
-  top: 0 !important;
-}
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#18202b;background:#f5f6fa}
+*{box-sizing:border-box}body{margin:0;padding:20px}
+main{max-width:1200px;margin:auto}
+h1{font-size:clamp(1.5rem,3vw,2rem);margin:0 0 8px}
+.intro{color:#5b6472;margin:0 0 18px;line-height:1.5}
+.notice{background:#fff7df;border:1px solid #f0d58a;padding:12px 14px;border-radius:12px;margin-bottom:18px;font-size:.94rem;line-height:1.5}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+button,.filelabel{border:0;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer;background:#222b3a;color:white;font-size:.92rem}
+button.secondary,.filelabel{background:#e6e9f0;color:#202938}
+button:focus-visible,textarea:focus-visible{outline:3px solid #9cbcff;outline-offset:2px}
+.columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.panel{background:white;border:1px solid #e1e5ec;border-radius:14px;overflow:hidden;min-width:0;display:flex;flex-direction:column}
+.panelhead{padding:14px 14px 10px;border-bottom:1px solid #edf0f5}
+.panelhead h2{font-size:1.05rem;margin:0 0 4px}
+.count{font-size:.82rem;color:#687283}
+textarea{width:100%;min-height:340px;resize:vertical;border:0;padding:14px;font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none;white-space:pre;overflow:auto}
+textarea::placeholder{color:#9aa2af}
+.panelfoot{padding:10px 12px;border-top:1px solid #edf0f5;display:flex;gap:8px;flex-wrap:wrap}
+.panelfoot button{padding:8px 10px;font-size:.82rem}
+.status{margin:12px 0 0;color:#5b6472;font-size:.9rem;min-height:1.4em}
+@media(max-width:850px){.columns{grid-template-columns:1fr}.panel textarea{min-height:190px}}
 </style>
 </head>
-
 <body>
 <main>
-
-<section id="indonesia" class="hidden">
-</section>
-
-<section id="international" class="hidden">
-  <h2 id="destination-title">🍆🍑👅💦</h2>
-  <p id="destination-text"></p>
-  <a class="link-button"
-     id="destination-link"
-     href="https://byuxyz8.github.io/mypage/akQns7pdM8"
-     target="_blank"
-     rel="noopener noreferrer">
-    👉🏻 Click Here
-  </a>
-</section>
-
-<div id="google_translate_element" class="hidden"></div>
-
+  <h1>Instagram Username Checker</h1>
+  <p class="intro">Tempel username satu per baris, rapikan daftar, lalu pisahkan hasil pemeriksaan ke kolom Hidup atau Off.</p>
+  <div class="notice"><strong>Catatan:</strong> Situs statis ini tidak dapat memastikan status Instagram secara otomatis. Akun privat, pembatasan Instagram, perubahan username, atau gangguan jaringan dapat membuat hasil tidak pasti. Gunakan tombol <em>Buka profil</em> untuk memeriksa akun; tandai hasilnya secara manual. “Off” berarti tidak ditemukan saat diperiksa, bukan bukti pasti akun sudah mati.</div>
+  <div class="tools">
+    <button id="clean">Rapikan daftar awal</button>
+    <button id="openBatch" class="secondary">Buka profil pertama yang belum diperiksa</button>
+    <button id="export" class="secondary">Ekspor semua hasil (.txt)</button>
+    <button id="clear" class="secondary">Kosongkan semua</button>
+  </div>
+  <div class="columns">
+    <section class="panel">
+      <div class="panelhead"><h2>1. Semua Username</h2><div class="count" id="allCount">0 username</div></div>
+      <textarea id="all" spellcheck="false" placeholder="contoh_username&#10;username.kedua&#10;usernameketiga"></textarea>
+      <div class="panelfoot">
+        <button id="dedupe">Hapus duplikat</button>
+        <button id="moveLive" class="secondary">Pindahkan sisa ke Hidup</button>
+        <button id="copyAll" class="secondary">Salin</button>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panelhead"><h2>2. Username Hidup</h2><div class="count" id="liveCount">0 username</div></div>
+      <textarea id="live" spellcheck="false" placeholder="Username yang profilnya berhasil ditemukan"></textarea>
+      <div class="panelfoot">
+        <button id="addLive">Tandai username terpilih sebagai Hidup</button>
+        <button id="copyLive" class="secondary">Salin</button>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panelhead"><h2>3. Username Off</h2><div class="count" id="offCount">0 username</div></div>
+      <textarea id="off" spellcheck="false" placeholder="Username yang tidak ditemukan saat diperiksa"></textarea>
+      <div class="panelfoot">
+        <button id="addOff">Tandai username terpilih sebagai Off</button>
+        <button id="copyOff" class="secondary">Salin</button>
+      </div>
+    </section>
+  </div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
 </main>
-
 <script>
-(function () {
-  "use strict";
-
-  function show(id) {
-    var main = document.querySelector("main");
-    var indonesia = document.getElementById("indonesia");
-    var international = document.getElementById("international");
-
-    indonesia.classList.add("hidden");
-    international.classList.add("hidden");
-
-    if (id === "indonesia") {
-      document.documentElement.style.background = "#000";
-      document.body.style.background = "#000";
-      document.body.style.padding = "0";
-      main.style.display = "none";
-      return;
-    }
-
-    document.documentElement.style.background = "#101014";
-    document.body.style.background = "#101014";
-    document.body.style.padding = "0";
-    main.style.display = "block";
-    international.classList.remove("hidden");
-  }
-
-  function setLanguage(lang) {
-    document.documentElement.lang = lang;
-
-    var t = {
-      en: {
-        title: "My Page",
-        continue: "🍆🍑👅💦",
-        description: "",
-        open: "👉🏻 Click Here"
-      }
-    };
-
-    var x = t[lang] || t.en;
-    document.title = x.title;
-    document.getElementById("destination-title").textContent = x.continue;
-    document.getElementById("destination-text").textContent = x.description;
-    document.getElementById("destination-link").textContent = x.open;
-  }
-
-  function translatePage() {
-    if (window.google && google.translate) {
-      new google.translate.TranslateElement({
-        pageLanguage: "en",
-        autoDisplay: false
-      }, "google_translate_element");
-    }
-  }
-
-  window.googleTranslateElementInit = translatePage;
-
-  function loadGoogleTranslate(browserLang) {
-    if (browserLang === "en") return;
-
-    var script = document.createElement("script");
-    script.src =
-      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-    script.onerror = function () {};
-    document.head.appendChild(script);
-
-    var attempts = 0;
-    var timer = setInterval(function () {
-      attempts++;
-      var select = document.querySelector(".goog-te-combo");
-
-      if (select) {
-        clearInterval(timer);
-        select.value = browserLang;
-        select.dispatchEvent(new Event("change"));
-      }
-
-      if (attempts >= 20) clearInterval(timer);
-    }, 500);
-  }
-
-  fetch("https://ipapi.co/json/", { cache: "no-store" })
-    .then(function (response) {
-      if (!response.ok) throw new Error("Location lookup failed");
-      return response.json();
-    })
-    .then(function (data) {
-      if (!data || !data.country_code) {
-        throw new Error("Country unavailable");
-      }
-
-      if (data.country_code === "ID") {
-        show("indonesia");
-        return;
-      }
-
-      setLanguage("en");
-      show("international");
-
-      var browserLang =
-        (navigator.languages && navigator.languages[0]) ||
-        navigator.language ||
-        "en";
-
-      browserLang = browserLang.split("-")[0].toLowerCase();
-      loadGoogleTranslate(browserLang);
-    })
-    .catch(function () {
-      setLanguage("en");
-      show("international");
-    });
-})();
+const $ = id => document.getElementById(id);
+const boxes = {all:$('all'), live:$('live'), off:$('off')};
+function parse(text){
+  return text.split(/[\n,\t; ]+/).map(s=>s.trim().replace(/^@/,'').replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/\/.*$/,'')).filter(s=>s && /^[A-Za-z0-9._]{1,30}$/.test(s));
+}
+function unique(list){const seen=new Set();return list.filter(x=>{const k=x.toLowerCase();if(seen.has(k))return false;seen.add(k);return true})}
+function setBox(id,list){boxes[id].value=unique(list).join('\n');update()}
+function update(){
+  $('allCount').textContent=parse(boxes.all.value).length+' username';
+  $('liveCount').textContent=parse(boxes.live.value).length+' username';
+  $('offCount').textContent=parse(boxes.off.value).length+' username';
+}
+function msg(t){$('status').textContent=t}
+Object.values(boxes).forEach(el=>el.addEventListener('input',update));
+$('clean').onclick=()=>{setBox('all',parse(boxes.all.value));msg('Daftar awal sudah dirapikan.')};
+$('dedupe').onclick=()=>{setBox('all',parse(boxes.all.value));msg('Username duplikat dihapus.')};
+$('moveLive').onclick=()=>{
+  const existing=new Set([...parse(boxes.live.value),...parse(boxes.off.value)].map(s=>s.toLowerCase()));
+  const remaining=parse(boxes.all.value).filter(s=>!existing.has(s.toLowerCase()));
+  setBox('live',[...parse(boxes.live.value),...remaining]);setBox('all',[]);
+  msg('Username yang belum diklasifikasikan dipindahkan ke Hidup. Pastikan statusnya benar sebelum menggunakan fitur ini.');
+};
+function classify(target){
+  const selected=window.getSelection()?.toString();
+  let items=[];
+  // The browser textarea selection is used when possible; otherwise move all entries in the first column.
+  const start=boxes.all.selectionStart,end=boxes.all.selectionEnd;
+  if(start!==end) items=parse(boxes.all.value.slice(start,end));
+  else items=parse(boxes.all.value);
+  if(!items.length){msg('Tidak ada username untuk dipindahkan.');return}
+  setBox(target,[...parse(boxes[target].value),...items]);
+  const moved=new Set(items.map(s=>s.toLowerCase()));
+  setBox('all',parse(boxes.all.value).filter(s=>!moved.has(s.toLowerCase())));
+  msg(items.length+' username dipindahkan ke kolom '+(target==='live'?'Hidup':'Off')+'.');
+}
+$('addLive').onclick=()=>classify('live');
+$('addOff').onclick=()=>classify('off');
+async function copy(id){try{await navigator.clipboard.writeText(boxes[id].value);msg('Kolom berhasil disalin.')}catch(e){boxes[id].focus();boxes[id].select();msg('Tekan Salin lagi atau salin teks yang sudah dipilih.')} }
+$('copyAll').onclick=()=>copy('all');$('copyLive').onclick=()=>copy('live');$('copyOff').onclick=()=>copy('off');
+$('openBatch').onclick=()=>{
+  const classified=new Set([...parse(boxes.live.value),...parse(boxes.off.value)].map(s=>s.toLowerCase()));
+  const next=parse(boxes.all.value).find(s=>!classified.has(s.toLowerCase()));
+  if(!next){msg('Tidak ada username yang belum diperiksa.');return}
+  window.open('https://www.instagram.com/'+encodeURIComponent(next)+'/','_blank','noopener');
+  msg('Profil '+next+' dibuka di tab baru. Periksa hasilnya, lalu tandai secara manual.');
+};
+$('export').onclick=()=>{
+  const text='SEMUA USERNAME\n'+boxes.all.value+'\n\nHIDUP\n'+boxes.live.value+'\n\nOFF / TIDAK DITEMUKAN SAAT DIPERIKSA\n'+boxes.off.value+'\n';
+  const blob=new Blob([text],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='hasil-instagram-checker.txt';a.click();URL.revokeObjectURL(url);msg('File hasil dibuat.');
+};
+$('clear').onclick=()=>{if(confirm('Kosongkan semua kolom?')){Object.values(boxes).forEach(el=>el.value='');update();msg('Semua kolom dikosongkan.')}};
+update();
 </script>
-
 </body>
   </html>
