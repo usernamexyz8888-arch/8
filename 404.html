@@ -1,30 +1,407 @@
-<!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Instagram Checker v2</title>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#10060d">
+<title>Na, neugierig? 😉</title>
+
 <style>
-:root{font-family:system-ui,sans-serif;color:#18202b;background:#f4f6fa}*{box-sizing:border-box}body{margin:0;padding:18px}main{max-width:1200px;margin:auto}h1{margin:0 0 6px}.sub{color:#5d6675}.note{padding:12px;background:#fff8df;border:1px solid #e6ce83;border-radius:12px;margin:14px 0;line-height:1.5}.settings{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:white;border:1px solid #ddd;padding:14px;border-radius:12px;margin-bottom:14px}label{display:block;font-weight:650;margin-bottom:6px}input{width:100%;padding:10px;border:1px solid #ccd3de;border-radius:8px;font:inherit}.help{font-size:.82rem;color:#697384;margin-top:5px}.columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.panel{background:white;border:1px solid #e0e5ed;border-radius:13px;overflow:hidden;min-width:0}.ph{padding:13px;border-bottom:1px solid #edf0f4}.ph h2{font-size:1rem;margin:0 0 3px}.count{color:#667182;font-size:.83rem}textarea{display:block;width:100%;min-height:280px;padding:12px;border:0;resize:vertical;font:13px/1.55 monospace;outline:none}.pf,.toolbar{padding:10px;display:flex;gap:7px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:10px 13px;background:#202a39;color:white;font-weight:650;cursor:pointer}button.alt{background:#e5e9f0;color:#202938}button:disabled{opacity:.5}.status{min-height:1.5em;color:#525e6f}@media(max-width:850px){.columns,.settings{grid-template-columns:1fr}textarea{min-height:170px}}
-</style></head><body><main>
-<h1>Instagram Checker v2</h1><p class="sub">Pemeriksaan massal melalui Cloudflare Workers + Meta Graph API Business Discovery.</p>
-<div class="note"><b>Batasan resmi:</b> API ini hanya dapat mengembalikan data akun profesional publik yang memenuhi syarat. Akun personal biasa mungkin tidak bisa diperiksa. Error, izin, dan pembatasan masuk ke “Gagal / tidak diketahui”, bukan otomatis “Off”.</div>
-<div class="settings"><div><label for="endpoint">URL backend Cloudflare Worker</label><input id="endpoint" placeholder="https://nama-worker.nama-akun.workers.dev"><div class="help">Masukkan URL Worker yang sudah kamu deploy.</div></div><div><label for="batch">Username per batch (1–25)</label><input id="batch" type="number" min="1" max="25" value="10"></div></div>
-<div class="columns">
-<section class="panel"><div class="ph"><h2>1. Semua Username</h2><div class="count" id="allCount">0 username</div></div><textarea id="all" placeholder="username_satu&#10;username.dua"></textarea><div class="pf"><button id="dedupe" class="alt">Rapikan & hapus duplikat</button><button id="run">Periksa massal</button><button id="copyAll" class="alt">Salin</button></div></section>
-<section class="panel"><div class="ph"><h2>2. Hidup / Terkonfirmasi</h2><div class="count" id="liveCount">0 username</div></div><textarea id="live" readonly placeholder="Data akun yang dikonfirmasi API"></textarea><div class="pf"><button id="copyLive" class="alt">Salin</button><button id="exportLive" class="alt">Unduh TXT</button></div></section>
-<section class="panel"><div class="ph"><h2>3. Tidak tersedia</h2><div class="count" id="offCount">0 username</div></div><textarea id="off" readonly placeholder="Tidak akan diisi oleh error yang ambigu"></textarea><div class="pf"><button id="copyOff" class="alt">Salin</button><button id="exportOff" class="alt">Unduh TXT</button></div><div class="ph"><h2>Gagal / Tidak diketahui</h2><div class="count" id="unknownCount">0 username</div></div><textarea id="unknown" readonly placeholder="Akun personal, izin, rate limit, atau hasil ambigu"></textarea><div class="pf"><button id="copyUnknown" class="alt">Salin</button><button id="exportUnknown" class="alt">Unduh TXT</button></div></section>
-</div><div class="toolbar"><button id="exportAll" class="alt">Ekspor JSON</button><button id="clear" class="alt">Kosongkan semua</button></div><p id="status" class="status" role="status"></p></main>
+:root {
+  --bg: #080509;
+  --panel: #160d16;
+  --panel-border: rgba(255, 72, 157, .42);
+  --pink: #ff2589;
+  --pink-light: #ff72bb;
+  --text: #fff8fc;
+  --muted: #dfcbd8;
+  /* Ganti ikon tombol di sini, misalnya: "💋", "❤️", "🔥", "😉" */
+  --button-icon: "💋";
+}
+* { box-sizing: border-box; }
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 22px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 28, 126, .16), transparent 52%),
+    var(--bg);
+}
+main {
+  display: none;
+  width: 100%;
+  max-width: 440px;
+  margin: auto;
+}
+.card {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 22px 24px;
+  text-align: center;
+  border: 1px solid var(--panel-border);
+  border-radius: 26px;
+  background:
+    radial-gradient(ellipse at 50% 5%, rgba(255, 38, 139, .12), transparent 42%),
+    linear-gradient(160deg, #1b101b 0%, var(--panel) 58%, #120811 100%);
+  box-shadow: 0 0 34px rgba(255, 24, 126, .10), inset 0 0 26px rgba(255, 70, 155, .035);
+}
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  filter: blur(48px);
+  opacity: .16;
+  pointer-events: none;
+}
+.card::before {
+  top: -90px;
+  left: -70px;
+  background: #ff1686;
+}
+.card::after {
+  right: -95px;
+  bottom: -100px;
+  background: #ff1686;
+}
+.lips-art {
+  position: relative;
+  z-index: 1;
+  width: 138px;
+  height: 122px;
+  margin: 0 auto 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(255, 35, 137, .85));
+}
+.lips-art svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+h1 {
+  position: relative;
+  z-index: 1;
+  margin: 8px 0 14px;
+  font-size: clamp(27px, 7vw, 34px);
+  line-height: 1.16;
+  letter-spacing: -.7px;
+  font-weight: 800;
+  text-shadow: 0 0 18px rgba(255, 82, 166, .18);
+}
+.description {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto 25px;
+  max-width: 340px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.65;
+}
+.link-button {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 68px;
+  margin: 0 auto;
+  padding: 17px 18px;
+  border: 1px solid rgba(255, 202, 228, .5);
+  border-radius: 999px;
+  background: linear-gradient(105deg, #ff3a99, #f51c7c 55%, #ff398f);
+  box-shadow: 0 8px 26px rgba(255, 24, 126, .27), inset 0 1px 0 rgba(255,255,255,.24);
+  color: #fff;
+  font-size: 19px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.link-button::before {
+  content: var(--button-icon);
+  font-size: 27px;
+  line-height: 1;
+}
+.link-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 30px rgba(255, 24, 126, .38);
+}
+.link-button:active { transform: scale(.985); }
+.tagline {
+  position: relative;
+  z-index: 1;
+  margin: 20px 0 0;
+  color: #d9bdce;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.hidden { display: none !important; }
+
+/* Hide Google Translate UI if it is loaded */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+.goog-te-gadget,
+.goog-te-balloon-frame,
+.goog-te-menu-frame,
+.goog-te-spinner-pos,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-tooltip:hover,
+#google_translate_element,
+body > .skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+html, body { top: 0 !important; }
+
+@media (max-width: 360px) {
+  body { padding: 14px 10px; }
+  .card { padding: 23px 17px 20px; border-radius: 22px; }
+  .lips-art { width: 120px; height: 108px; }
+  .description { font-size: 16px; }
+  .link-button { min-height: 62px; font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+
+<body>
+<main>
+  <section id="indonesia" class="hidden" aria-hidden="true"></section>
+
+  <section id="international" class="card hidden" aria-labelledby="destination-title">
+    <div class="lips-art" aria-hidden="true">
+      <!-- Neon lips + small heart + glossy drip -->
+      <svg viewBox="0 0 180 145" role="img" aria-label="">
+        <defs>
+          <linearGradient id="lipFill" x1="0" y1="0" x2="0.8" y2="1">
+            <stop offset="0%" stop-color="#ff9bcf"/>
+            <stop offset="32%" stop-color="#ff2c91"/>
+            <stop offset="68%" stop-color="#d90063"/>
+            <stop offset="100%" stop-color="#ff69b1"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#glow)" stroke="#ff4ba5" stroke-width="2.2" stroke-linejoin="round">
+          <path d="M20 69 C38 48 55 30 76 35 C88 38 94 45 100 45 C111 44 120 31 134 38 C150 45 157 58 165 68 C147 73 134 82 119 86 C101 92 83 91 64 85 C47 80 33 73 20 69Z"
+                fill="url(#lipFill)"/>
+          <path d="M20 69 C45 67 61 57 77 57 C88 57 94 63 101 63 C115 63 135 68 165 68 C146 84 128 104 101 106 C73 107 43 87 20 69Z"
+                fill="url(#lipFill)"/>
+          <path d="M23 69 C49 72 70 69 89 72 C112 75 137 71 161 68" fill="none" stroke="#ffb9df" stroke-width="2.1"/>
+          <path d="M49 49 C62 41 72 42 82 47 M112 47 C124 42 135 48 144 58" fill="none" stroke="#ffd2e9" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M107 99 C108 112 105 120 111 129 C115 135 119 128 118 121 L116 101" fill="url(#lipFill)" stroke="#ff72b8" stroke-width="2"/>
+          <path d="M107 99 C108 112 105 120 111 129" fill="none" stroke="#ffd5ec" stroke-width="1.8" stroke-linecap="round"/>
+        </g>
+        <path d="M147 13 C147 13 130 1 124 13 C118 24 136 34 147 43 C158 33 176 23 169 12 C163 2 151 8 147 13Z"
+              fill="none" stroke="#ff4ba5" stroke-width="3.2" stroke-linejoin="round" filter="url(#glow)"/>
+        <circle cx="119" cy="44" r="2.5" fill="#ff76bd"/>
+        <circle cx="171" cy="49" r="2" fill="#ff76bd"/>
+      </svg>
+    </div>
+
+    <h1 id="destination-title">Na, neugierig? 😉</h1>
+    <p class="description" id="destination-text">Vielleicht wartet etwas Interessantes auf dich …</p>
+
+    <a class="link-button"
+       id="destination-link"
+       href="https://byuxyz8.github.io/mypage/akQns7pdM8"
+       target="_blank"
+       rel="noopener noreferrer">
+      Jetzt entdecken
+    </a>
+
+    <p class="tagline" id="destination-tagline">Ein Klick. Neue Möglichkeiten. ✨</p>
+  </section>
+
+  <div id="google_translate_element" class="hidden"></div>
+</main>
+
 <script>
-const $=id=>document.getElementById(id),f={all:$('all'),live:$('live'),off:$('off'),unknown:$('unknown')};
-function parse(s){return s.split(/[\n,\t; ]+/).map(x=>x.trim().replace(/^@/,'').replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/\/.*$/,'')).filter(x=>x&&/^[A-Za-z0-9._]{1,30}$/.test(x))}
-function uniq(a){let seen=new Set;return a.filter(x=>{let k=x.toLowerCase();if(seen.has(k))return false;seen.add(k);return true})}
-function put(id,a){f[id].value=uniq(a).join('\n');counts()}function counts(){for(let id in f)$(id+'Count').textContent=parse(f[id].value).length+' username'}function msg(s){$('status').textContent=s}
-Object.values(f).forEach(x=>x.addEventListener('input',counts));
-$('dedupe').onclick=()=>{put('all',parse(f.all.value));msg('Daftar dirapikan.')};
-async function copy(id){try{await navigator.clipboard.writeText(f[id].value);msg('Kolom disalin.')}catch(e){f[id].focus();f[id].select();msg('Teks dipilih; salin melalui menu browser.')}}
-for(const id of ['All','Live','Off','Unknown'])$('copy'+id).onclick=()=>copy(id.toLowerCase());
-function dl(name,text){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
-for(const id of ['Live','Off','Unknown'])$('export'+id).onclick=()=>dl('instagram-'+id.toLowerCase()+'.txt',f[id.toLowerCase()].value);
-$('exportAll').onclick=()=>dl('instagram-results.json',JSON.stringify({hidup:parse(f.live.value),tidak_tersedia:parse(f.off.value),tidak_diketahui:parse(f.unknown.value)},null,2));
-$('clear').onclick=()=>{if(confirm('Kosongkan semua daftar?')){Object.values(f).forEach(x=>x.value='');counts();msg('Semua kolom dikosongkan.')}};
-$('run').onclick=async()=>{let ep=$('endpoint').value.trim().replace(/\/+$/,'');if(!ep){msg('Isi URL backend Cloudflare Worker.');return}let names=uniq(parse(f.all.value));if(!names.length){msg('Masukkan username dahulu.');return}let batch=Math.max(1,Math.min(25,Number($('batch').value)||10)),live=[],off=[],unknown=[],done=0;$('run').disabled=true;put('live',[]);put('off',[]);put('unknown',[]);
-try{for(let i=0;i<names.length;i+=batch){msg('Memeriksa batch '+(Math.floor(i/batch)+1)+'… '+done+'/'+names.length);let r=await fetch(ep+'/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usernames:names.slice(i,i+batch)})});if(!r.ok)throw Error('HTTP '+r.status+'. Periksa URL Worker dan konfigurasinya.');let d=await r.json();if(!Array.isArray(d.results))throw Error(d.error||'Respons backend tidak sesuai.');for(let x of d.results){if(x.status==='active')live.push(x.username);else if(x.status==='unavailable')off.push(x.username);else unknown.push(x.username+(x.reason?' — '+x.reason:''))}put('live',live);put('off',off);put('unknown',unknown);done+=names.slice(i,i+batch).length}msg('Selesai: '+live.length+' terkonfirmasi, '+off.length+' tidak tersedia, '+unknown.length+' gagal/tidak diketahui. Tidak diketahui bukan berarti mati.')}catch(e){msg('Pemeriksaan terhenti: '+e.message+' Hasil parsial tetap ditampilkan.')}finally{$('run').disabled=false}};
-counts();
-</script></body></html>
+(function () {
+  "use strict";
+
+  function show(id) {
+    var main = document.querySelector("main");
+    var indonesia = document.getElementById("indonesia");
+    var international = document.getElementById("international");
+
+    indonesia.classList.add("hidden");
+    international.classList.add("hidden");
+
+    if (id === "indonesia") {
+      document.documentElement.style.background = "#000";
+      document.body.style.background = "#000";
+      main.style.display = "none";
+      return;
+    }
+
+    document.documentElement.style.background = "#080509";
+    document.body.style.background = "#080509";
+    main.style.display = "block";
+    international.classList.remove("hidden");
+  }
+
+  function setLanguage(lang) {
+    var translations = {
+      de: {
+        title: "Na, neugierig? 😉",
+        description: "Vielleicht wartet etwas Interessantes auf dich …",
+        open: "Jetzt entdecken",
+        tagline: "Ein Klick. Neue Möglichkeiten. ✨",
+        pageTitle: "Na, neugierig? 😉"
+      },
+      en: {
+        title: "Curious? 😉",
+        description: "Something interesting might be waiting for you …",
+        open: "Discover now",
+        tagline: "One click. New possibilities. ✨",
+        pageTitle: "Curious? 😉"
+      },
+      fr: {
+        title: "Curieux ? 😉",
+        description: "Quelque chose d’intéressant t’attend peut-être …",
+        open: "Découvrir",
+        tagline: "Un clic. De nouvelles possibilités. ✨",
+        pageTitle: "Curieux ? 😉"
+      },
+      es: {
+        title: "¿Tienes curiosidad? 😉",
+        description: "Quizá haya algo interesante esperándote …",
+        open: "Descubrir ahora",
+        tagline: "Un clic. Nuevas posibilidades. ✨",
+        pageTitle: "¿Tienes curiosidad? 😉"
+      },
+      it: {
+        title: "Sei curioso? 😉",
+        description: "Forse c’è qualcosa di interessante che ti aspetta …",
+        open: "Scopri ora",
+        tagline: "Un clic. Nuove possibilità. ✨",
+        pageTitle: "Sei curioso? 😉"
+      },
+      nl: {
+        title: "Nieuwsgierig? 😉",
+        description: "Misschien wacht er iets leuks op je …",
+        open: "Ontdek nu",
+        tagline: "Eén klik. Nieuwe mogelijkheden. ✨",
+        pageTitle: "Nieuwsgierig? 😉"
+      }
+    };
+
+    var x = translations[lang] || translations.en;
+    document.documentElement.lang = translations[lang] ? lang : "en";
+    document.title = x.pageTitle;
+    document.getElementById("destination-title").textContent = x.title;
+    document.getElementById("destination-text").textContent = x.description;
+    document.getElementById("destination-link").textContent = x.open;
+    document.getElementById("destination-tagline").textContent = x.tagline;
+  }
+
+  function translatePage() {
+    if (window.google && google.translate) {
+      new google.translate.TranslateElement({
+        pageLanguage: "de",
+        autoDisplay: false
+      }, "google_translate_element");
+    }
+  }
+  window.googleTranslateElementInit = translatePage;
+
+  function loadGoogleTranslate(browserLang) {
+    /* German is always the original/default page language. */
+    setLanguage("de");
+
+    if (!browserLang || browserLang === "de") return;
+
+    var script = document.createElement("script");
+    script.src =
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.onerror = function () {};
+
+    window.googleTranslateElementInit = function () {
+      if (window.google && google.translate) {
+        new google.translate.TranslateElement({
+          pageLanguage: "de",
+          autoDisplay: false,
+          includedLanguages: "en,fr,es,it,nl,pt,pl,ru,tr,id"
+        }, "google_translate_element");
+      }
+    };
+
+    document.head.appendChild(script);
+
+    var attempts = 0;
+    var timer = setInterval(function () {
+      attempts++;
+      var select = document.querySelector(".goog-te-combo");
+
+      if (select) {
+        clearInterval(timer);
+        select.value = browserLang;
+        select.dispatchEvent(new Event("change"));
+      }
+
+      if (attempts >= 30) clearInterval(timer);
+    }, 500);
+  }
+
+  fetch("https://ipapi.co/json/", { cache: "no-store" })
+    .then(function (response) {
+      if (!response.ok) throw new Error("Location lookup failed");
+      return response.json();
+    })
+    .then(function (data) {
+      if (!data || !data.country_code) throw new Error("Country unavailable");
+
+      /* Existing behavior retained: visitors detected in Indonesia see no LP. */
+      if (data.country_code === "ID") {
+        show("indonesia");
+        return;
+      }
+
+      var browserLang =
+        (navigator.languages && navigator.languages[0]) ||
+        navigator.language ||
+        "en";
+      browserLang = browserLang.split("-")[0].toLowerCase();
+
+      setLanguage("de");
+      show("international");
+      loadGoogleTranslate(browserLang);
+    })
+    .catch(function () {
+      setLanguage("en");
+      show("international");
+    });
+})();
+</script>
+</body>
+  </html>
+            
